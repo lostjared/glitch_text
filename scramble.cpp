@@ -19,7 +19,7 @@ std::string shuffle_word(std::string_view value) {
                 char c1 = value[0];
                 char c2 = value.back();
                 std::string v = std::string(value);
-                std::string temp = v.substr(1, value.length()-1);
+                std::string temp = v.substr(1, value.length()-2);
                 std::ranges::shuffle(temp, gen);
                 std::string word;
                 word += c1;
