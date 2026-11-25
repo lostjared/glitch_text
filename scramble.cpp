@@ -52,7 +52,7 @@ std::vector<std::string> split_words(std::string_view words) {
 
 int main(int argc, char **argv) {
 	std::ostringstream stream;
-	stream << std::cin.rdbuf();
+
 	std::vector<std::string> words = split_words(stream.str());
 	for(const auto &i : words) {
 		std::cout << i << " ";
