@@ -57,5 +57,6 @@ int main(int argc, char **argv) {
 	for(const auto &i : words) {
 		std::cout << i << " ";
 	}
+	std::cout << std::endl;
 	return EXIT_SUCCESS;
 }
