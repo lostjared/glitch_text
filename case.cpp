@@ -64,7 +64,8 @@ std::vector<std::string> split_words(std::string_view words) {
     std::vector<std::string> v;
     std::string word;
     for (auto it = words.begin(); it != words.end(); ++it) {
-        if (isalpha(static_cast<unsigned char>(*it))) {
+	unsigned char ch = static_cast<unsigned char>(*it);
+        if (isalpha(ch) || isdigit(ch)) {
             word += *it;
         } else {
             if (word.length() > 0) {
