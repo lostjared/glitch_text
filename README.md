@@ -2,7 +2,7 @@
 
 Three C++ command-line tools for text effects:
 
-- `case` continuously shuffles words and alternates uppercase and lowercase characters.
+- `twist-app` continuously shuffles words and alternates uppercase and lowercase characters.
 - `scramble` shuffles the interior letters of each word while preserving its first and last letters.
 - `rev-text` reverses the entire input, including spaces, punctuation, and newlines.
 
@@ -27,16 +27,16 @@ extensions, and defines three executable targets:
 
 | Target / executable | Source | Purpose |
 | --- | --- | --- |
-| `case` | `case.cpp` | Continuously shuffle words and alternate character case. |
+| `twist-app` | `twist-app.cpp` | Continuously shuffle words and alternate character case. |
 | `scramble` | `scramble.cpp` | Shuffle each word's interior letters once. |
 | `rev-text` | `rev.cpp` | Reverse the entire input once. |
 
-To build just one program, add `--target case`, `--target scramble`, or
+To build just one program, add `--target twist-app`, `--target scramble`, or
 `--target rev-text` to the build command.
 
 The examples below use a single-configuration
 build, which places the executables in `build/`. With a multi-configuration
-generator such as Visual Studio, use `build/Release/case.exe`,
+generator such as Visual Studio, use `build/Release/twist-app.exe`,
 `build/Release/scramble.exe`, and `build/Release/rev-text.exe` instead.
 `CMAKE_BUILD_TYPE` selects Release for
 single-configuration generators; `--config Release` selects it for
@@ -59,7 +59,7 @@ cmake --build build --config Release
 cmake --build build --config Release --target install
 ```
 
-This installs `case`, `scramble`, and `rev-text` into the prefix's `bin`
+This installs `twist-app`, `scramble`, and `rev-text` into the prefix's `bin`
 directory by default. Add that directory to your `PATH` to run the tools from
 anywhere. Set `CMAKE_INSTALL_BINDIR` at configure time to change the binary
 directory. On Windows, choose a writable prefix such as `C:/Tools/glitch_text`.
@@ -87,8 +87,8 @@ finite input source, such as a text file or a piped phrase.
 ### Alternating case and shuffled words
 
 ```text
-case --upper DELAY
-case --lower DELAY
+twist-app --upper DELAY
+twist-app --lower DELAY
 ```
 
 | Argument | Meaning |
@@ -100,15 +100,15 @@ case --lower DELAY
 In a Unix-like shell:
 
 ```sh
-printf '%s\n' 'Hello world from glitch text' | ./build/case --upper 50000
-./build/case --lower 100000 < input.txt
+printf '%s\n' 'Hello world from glitch text' | ./build/twist-app --upper 50000
+./build/twist-app --lower 100000 < input.txt
 ```
 
 In PowerShell (Visual Studio build):
 
 ```powershell
-'Hello world from glitch text' | .\build\Release\case.exe --upper 50000
-Get-Content -Raw input.txt | .\build\Release\case.exe --lower 100000
+'Hello world from glitch text' | .\build\Release\twist-app.exe --upper 50000
+Get-Content -Raw input.txt | .\build\Release\twist-app.exe --lower 100000
 ```
 
 The program repeatedly shuffles the words and prints them with alternating
@@ -173,15 +173,15 @@ it from the Unix `rev` utility, which reverses each line separately.
 
 ### Combining scrambling and alternating case
 
-With `scramble` and `case` on your `PATH`, pipe a file through both tools:
+With `scramble` and `twist-app` on your `PATH`, pipe a file through both tools:
 
 ```sh
-cat file.txt | scramble | env case --upper 1000
+cat file.txt | scramble | twist-app --upper 1000
 ```
 
-`env case` invokes the executable because `case` is a shell keyword.
+`twist-app` avoids conflicting with the shell keyword `case`.
 
-`scramble` shuffles each word's interior letters once, then `case` continuously
+`scramble` shuffles each word's interior letters once, then `twist-app` continuously
 shuffles the resulting words and alternates their case, starting with uppercase.
 The delay is 1,000 microseconds (1 millisecond) after each output chunk of up to
 16 bytes. Press **Ctrl+C** to stop.
@@ -189,15 +189,15 @@ The delay is 1,000 microseconds (1 millisecond) after each output chunk of up to
 To use the executables directly from a single-configuration build:
 
 ```sh
-cat file.txt | ./build/scramble | ./build/case --upper 1000
+cat file.txt | ./build/scramble | ./build/twist-app --upper 1000
 ```
 
 ## Input handling
 
-- For `case` and `scramble`, words are runs of alphabetic characters. Numbers, punctuation, and whitespace
+- For `twist-app` and `scramble`, words are runs of alphabetic characters. Numbers, punctuation, and whitespace
   act as separators and are omitted from the output.
-- For `case` and `scramble`, input containing no alphabetic words exits successfully without output.
-- `case` and `scramble` process bytes using C/C++ character classification and are intended
+- For `twist-app` and `scramble`, input containing no alphabetic words exits successfully without output.
+- `twist-app` and `scramble` process bytes using C/C++ character classification and are intended
   for ASCII text rather than Unicode-aware text transformation.
 - `rev-text` reverses every input byte, without filtering or splitting words.
 - All three tools buffer all input before producing output. Empty input produces
