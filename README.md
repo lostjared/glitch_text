@@ -1,10 +1,11 @@
 # glitch_text
 
-Three C++ command-line tools for text effects:
+Four C++ command-line tools for text effects:
 
 - `twist-app` continuously shuffles words and alternates uppercase and lowercase characters.
 - `scramble` shuffles the interior letters of each word while preserving its first and last letters.
 - `rev-text` reverses the entire input, including spaces, punctuation, and newlines.
+- `switch-case` alternates uppercase and lowercase characters in one pass, preserving input order and whitespace.
 
 ## Build
 
@@ -23,21 +24,23 @@ cmake --build build --config Release
 ```
 
 `CMakeLists.txt` sets C++20 as required, disables compiler-specific language
-extensions, and defines three executable targets:
+extensions, and defines four executable targets:
 
 | Target / executable | Source | Purpose |
 | --- | --- | --- |
 | `twist-app` | `twist-app.cpp` | Continuously shuffle words and alternate character case. |
 | `scramble` | `scramble.cpp` | Shuffle each word's interior letters once. |
 | `rev-text` | `rev.cpp` | Reverse the entire input once. |
+| `switch-case` | `switch_case.cpp` | Alternate character case once without shuffling. |
 
-To build just one program, add `--target twist-app`, `--target scramble`, or
-`--target rev-text` to the build command.
+To build just one program, add `--target twist-app`, `--target scramble`,
+`--target rev-text`, or `--target switch-case` to the build command.
 
 The examples below use a single-configuration
 build, which places the executables in `build/`. With a multi-configuration
 generator such as Visual Studio, use `build/Release/twist-app.exe`,
-`build/Release/scramble.exe`, and `build/Release/rev-text.exe` instead.
+`build/Release/scramble.exe`, `build/Release/rev-text.exe`, and
+`build/Release/switch-case.exe` instead.
 `CMAKE_BUILD_TYPE` selects Release for
 single-configuration generators; `--config Release` selects it for
 multi-configuration generators.
@@ -59,7 +62,7 @@ cmake --build build --config Release
 cmake --build build --config Release --target install
 ```
 
-This installs `twist-app`, `scramble`, and `rev-text` into the prefix's `bin`
+This installs `twist-app`, `scramble`, `rev-text`, and `switch-case` into the prefix's `bin`
 directory by default. Add that directory to your `PATH` to run the tools from
 anywhere. Set `CMAKE_INSTALL_BINDIR` at configure time to change the binary
 directory. On Windows, choose a writable prefix such as `C:/Tools/glitch_text`.
@@ -81,7 +84,7 @@ a staged installation.
 
 ## Usage
 
-All three tools read standard input until end-of-file before producing output. Use a
+All four tools read standard input until end-of-file before producing output. Use a
 finite input source, such as a text file or a piped phrase.
 
 ### Alternating case and shuffled words
@@ -171,6 +174,34 @@ The reversal operates on bytes, so use ASCII text: UTF-8 characters can be
 broken by reversing their bytes. The executable name `rev-text` also distinguishes
 it from the Unix `rev` utility, which reverses each line separately.
 
+### Alternating case once (`switch-case`)
+
+`switch-case` takes exactly one argument: `--upper` to start with uppercase or
+`--lower` to start with lowercase. It reads standard input, alternates character
+case once, then exits:
+
+```sh
+cmake --build build --config Release --target switch-case
+printf '%s' 'Hello world!' | ./build/switch-case --upper
+# Output: HeLlO WoRlD!
+printf '%s' 'Hello world!' | ./build/switch-case --lower
+# Output: hElLo wOrLd!
+./build/switch-case --upper < input.txt > alternating.txt
+```
+
+In PowerShell (Visual Studio build):
+
+```powershell
+'Hello world!' | .\build\Release\switch-case.exe --upper
+Get-Content -Raw input.txt | .\build\Release\switch-case.exe --lower
+```
+
+The program preserves character order, spaces, punctuation, numbers, and newlines.
+Every byte position advances the case alternation, including nonletters; the
+pattern continues across line breaks. It adds no newline. Missing, extra, or
+unrecognized arguments print usage information to standard error and exit with
+a failure status.
+
 ### Combining scrambling and alternating case
 
 With `scramble` and `twist-app` on your `PATH`, pipe a file through both tools:
@@ -200,7 +231,10 @@ cat file.txt | ./build/scramble | ./build/twist-app --upper 1000
 - `twist-app` and `scramble` process bytes using C/C++ character classification and are intended
   for ASCII text rather than Unicode-aware text transformation.
 - `rev-text` reverses every input byte, without filtering or splitting words.
-- All three tools buffer all input before producing output. Empty input produces
+- `switch-case` changes case without filtering or splitting words. It uses byte-based
+  C/C++ case conversion and is intended for ASCII text rather than Unicode-aware
+  text transformation.
+- All four tools buffer all input before producing output. Empty input produces
   no output.
 
 ## Clean
