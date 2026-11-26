@@ -1,16 +1,16 @@
 # glitch_text
 
-Two C++ command-line tools for text effects:
+Three C++ command-line tools for text effects:
 
 - `case` continuously shuffles words and alternates uppercase and lowercase characters.
 - `scramble` shuffles the interior letters of each word while preserving its first and last letters.
+- `rev-text` reverses the entire input, including spaces, punctuation, and newlines.
 
 ## Build
 
 Requirements:
 
-- CMake 3.13 or newer for the commands below (`CMakeLists.txt` declares a
-  minimum of 3.10).
+- CMake 3.13 or newer.
 - A C++20 compiler and standard library with support for C++ ranges.
 - A build tool supported by your CMake generator, such as Make, Ninja, or
   Visual Studio's MSBuild.
@@ -23,20 +23,22 @@ cmake --build build --config Release
 ```
 
 `CMakeLists.txt` sets C++20 as required, disables compiler-specific language
-extensions, and defines two executable targets:
+extensions, and defines three executable targets:
 
 | Target / executable | Source | Purpose |
 | --- | --- | --- |
 | `case` | `case.cpp` | Continuously shuffle words and alternate character case. |
 | `scramble` | `scramble.cpp` | Shuffle each word's interior letters once. |
+| `rev-text` | `rev.cpp` | Reverse the entire input once. |
 
-To build just one program, add `--target case` or `--target scramble` to the
-build command.
+To build just one program, add `--target case`, `--target scramble`, or
+`--target rev-text` to the build command.
 
 The examples below use a single-configuration
 build, which places the executables in `build/`. With a multi-configuration
-generator such as Visual Studio, use `build/Release/case.exe` and
-`build/Release/scramble.exe` instead. `CMAKE_BUILD_TYPE` selects Release for
+generator such as Visual Studio, use `build/Release/case.exe`,
+`build/Release/scramble.exe`, and `build/Release/rev-text.exe` instead.
+`CMAKE_BUILD_TYPE` selects Release for
 single-configuration generators; `--config Release` selects it for
 multi-configuration generators.
 
@@ -49,7 +51,7 @@ cmake --build build-clang --config Release
 
 ## Usage
 
-Both tools read standard input until end-of-file before producing output. Use a
+All three tools read standard input until end-of-file before producing output. Use a
 finite input source, such as a text file or a piped phrase.
 
 ### Alternating case and shuffled words
@@ -109,7 +111,37 @@ interior letters are shuffled; word length and the first and last letters are
 preserved. A shuffle can leave a word unchanged. Output includes a space after
 each word and no added newline.
 
-### Combining both effects
+### Reversed text (`rev-text`)
+
+The program in `rev.cpp` is built as `rev-text`. It takes no arguments and reads
+text from standard input, rather than accepting a filename as an argument:
+
+```sh
+cmake --build build --config Release --target rev-text
+printf '%s' 'Hello world!' | ./build/rev-text
+# Output: !dlrow olleH
+./build/rev-text < input.txt > reversed.txt
+```
+
+In PowerShell (Visual Studio build):
+
+```powershell
+'Hello world!' | .\build\Release\rev-text.exe
+Get-Content -Raw input.txt | .\build\Release\rev-text.exe
+```
+
+`rev-text` reverses the entire input once, then exits. It preserves all input
+bytes, including numbers, punctuation, and whitespace, but reverses their order.
+For multiple lines, this reverses both the order of the lines and the contents
+of each line. A trailing input newline moves to the beginning of the output;
+no newline is added. The Unix example uses `printf '%s'` to avoid a trailing
+input newline; PowerShell's string pipeline adds a line ending.
+
+The reversal operates on bytes, so use ASCII text: UTF-8 characters can be
+broken by reversing their bytes. The executable name `rev-text` also distinguishes
+it from the Unix `rev` utility, which reverses each line separately.
+
+### Combining scrambling and alternating case
 
 With `scramble` and `case` on your `PATH`, pipe a file through both tools:
 
@@ -132,12 +164,14 @@ cat file.txt | ./build/scramble | ./build/case --upper 1000
 
 ## Input handling
 
-- Words are runs of alphabetic characters. Numbers, punctuation, and whitespace
+- For `case` and `scramble`, words are runs of alphabetic characters. Numbers, punctuation, and whitespace
   act as separators and are omitted from the output.
-- Input containing no alphabetic words exits successfully without output.
-- Both tools process bytes using C/C++ character classification and are intended
+- For `case` and `scramble`, input containing no alphabetic words exits successfully without output.
+- `case` and `scramble` process bytes using C/C++ character classification and are intended
   for ASCII text rather than Unicode-aware text transformation.
-- Both tools buffer all input before producing output.
+- `rev-text` reverses every input byte, without filtering or splitting words.
+- All three tools buffer all input before producing output. Empty input produces
+  no output.
 
 ## Clean
 
