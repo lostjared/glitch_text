@@ -49,6 +49,36 @@ cmake -S . -B build-clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Releas
 cmake --build build-clang --config Release
 ```
 
+## Install and uninstall
+
+Choose an install prefix when configuring, then build and install:
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$HOME/.local"
+cmake --build build --config Release
+cmake --build build --config Release --target install
+```
+
+This installs `case`, `scramble`, and `rev-text` into the prefix's `bin`
+directory by default. Add that directory to your `PATH` to run the tools from
+anywhere. Set `CMAKE_INSTALL_BINDIR` at configure time to change the binary
+directory. On Windows, choose a writable prefix such as `C:/Tools/glitch_text`.
+System-wide prefixes may require elevated permissions for installation and
+uninstallation.
+
+Uninstall using the same build directory:
+
+```sh
+cmake --build build --config Release --target uninstall
+```
+
+The uninstall target removes files recorded in `build/install_manifest.txt`,
+leaves directories and unrelated files in place, and skips files already
+removed. Keep the build directory and manifest until you uninstall. The manifest
+records the most recent installation from that build directory. Both targets
+support CMake's `DESTDIR` staging on Unix; use the same `DESTDIR` when uninstalling
+a staged installation.
+
 ## Usage
 
 All three tools read standard input until end-of-file before producing output. Use a
@@ -180,7 +210,6 @@ cmake --build build --target clean
 ```
 
 This removes compiled build outputs while keeping the CMake configuration.
-The project currently defines no CMake install target.
 
 ## License
 
