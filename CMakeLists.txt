@@ -7,9 +7,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_executable(twist-app twist-app.cpp)
 add_executable(scramble scramble.cpp)
 add_executable(rev-text rev.cpp)
+add_executable(switch-case switch_case.cpp)
 
 include(GNUInstallDirs)
-install(TARGETS twist-app scramble rev-text
+install(TARGETS twist-app scramble rev-text switch-case
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
 )
 
