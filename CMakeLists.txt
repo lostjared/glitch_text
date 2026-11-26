@@ -6,4 +6,4 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(case case.cpp)
 add_executable(scramble scramble.cpp)
-
+add_executable(rev-text rev.cpp)
