@@ -44,7 +44,8 @@ std::string twistCase(bool start, std::string_view data) {
             text += tolower(static_cast<unsigned char>(*it));
         else
             text += toupper(static_cast<unsigned char>(*it));
-        lead = !lead;
+	if(isalpha(static_cast<unsigned char>(*it)))
+	        lead = !lead;
     }
     return text;
 }
